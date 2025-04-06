@@ -33,8 +33,6 @@ public class RunServer {
         collectionManager.setCollection(initCollection);
 
 
-
-
         CommandManager commandManager = new CommandManager();
         RecursionDequeHandler recursionDequeHandler = RecursionDequeHandler.getInstance();
 
@@ -55,8 +53,9 @@ public class RunServer {
                 .add("count_less_than_genre", new CountLessGenre(collectionManager));
 
         RequestManager requestManager = new RequestManager(commandManager);
+        CommandListener commandListener = new CommandListener(fileManager, collectionManager, parseManager, console);
         try {
-            Server server = new Server(8080, requestManager, fileManager, collectionManager, parseManager, console);
+            Server server = new Server(8080, requestManager, fileManager, collectionManager, parseManager, console, commandListener);
             server.run();
 
         } catch (Exception e) {

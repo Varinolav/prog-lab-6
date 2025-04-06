@@ -28,8 +28,6 @@ public class UserService {
         String params = userCommand[1].trim();
         RequestEntity request = RequestEntity.create(command, params);
         if (command.equals("exit")) {
-            request = RequestEntity.create("save", "");
-            console.println("Идет сохранение изменений...");
             console.println("Завершаем работу программы.");
             System.exit(0);
         }

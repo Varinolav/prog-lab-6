@@ -3,10 +3,7 @@ package ru.varino.server;
 import ru.varino.common.communication.RequestEntity;
 import ru.varino.common.communication.ResponseEntity;
 import ru.varino.common.exceptions.PermissionDeniedException;
-import ru.varino.server.managers.CollectionManager;
-import ru.varino.server.managers.FileManager;
-import ru.varino.server.managers.ParseManager;
-import ru.varino.server.managers.RequestManager;
+import ru.varino.server.managers.*;
 import ru.varino.common.io.Console;
 
 import java.io.*;
@@ -22,14 +19,16 @@ public class Server {
     private CollectionManager collectionManager;
     private ParseManager parseManager;
     private Console console;
+    private CommandListener commandListener;
 
-    public Server(int port, RequestManager requestManager, FileManager fileManager, CollectionManager collectionManager, ParseManager parseManager, Console console) {
+    public Server(int port, RequestManager requestManager, FileManager fileManager, CollectionManager collectionManager, ParseManager parseManager, Console console, CommandListener commandListener) {
         this.port = port;
         this.requestManager = requestManager;
         this.fileManager = fileManager;
         this.collectionManager = collectionManager;
         this.parseManager = parseManager;
         this.console = console;
+        this.commandListener = commandListener;
     }
 
     private ResponseEntity processRequest(RequestEntity request) {
@@ -38,30 +37,8 @@ public class Server {
     }
 
     public void run() {
-        new Thread(() -> {
-            Scanner scanner = new Scanner(System.in);
-            while (true) {
-                try {
-                    String stringInput = scanner.nextLine();
-                    if (stringInput.trim().equals("save")) {
-                        try {
-                            fileManager.write(parseManager.getJsonFromHashTable(collectionManager.getCollection()));
-
-                        } catch (PermissionDeniedException e) {
-                            console.printerr(e.getMessage());
-                        }
-                    } else if (stringInput.trim().equals("exit")) {
-                        console.println("Завершение работы сервера...");
-                        System.exit(0);
-                    } else {
-                        console.println("Доступны только 2 команды: save и exit");
-                    }
-                } catch (NoSuchElementException exception) {
-                    console.println("");
-                    console.printerr("Работа программы прекращена!");
-                }
-            }
-        }).start();
+        Thread listener = commandListener.getListener();
+        listener.start();
         while (true) {
             try (ServerSocket serverSocket = new ServerSocket(port)) {
                 Socket sock = serverSocket.accept();

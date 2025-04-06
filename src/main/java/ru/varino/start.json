@@ -37,25 +37,6 @@
       "nationality": "SPAIN"
     }
   },
-  "124": {
-    "id": 3,
-    "name": "a",
-    "coordinates": {
-      "x": 3,
-      "y": 1
-    },
-    "creationDate": "2025-04-06",
-    "oscarsCount": 1,
-    "totalBoxOffice": 12,
-    "tagline": "bibi",
-    "genre": "COMEDY",
-    "director": {
-      "name": "artem",
-      "birthday": "2023-12-12 10:00",
-      "weight": 102,
-      "nationality": "SPAIN"
-    }
-  },
   "123": {
     "id": 4,
     "name": "a",
