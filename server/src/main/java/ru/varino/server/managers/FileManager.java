@@ -1,7 +1,10 @@
 package ru.varino.server.managers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.varino.common.exceptions.PermissionDeniedException;
 import ru.varino.common.io.Console;
+
 
 import java.io.*;
 
@@ -11,6 +14,7 @@ import java.io.*;
 public class FileManager {
     private final Console console;
     private String fileName;
+    private static final Logger logger = LoggerFactory.getLogger(FileManager.class.getSimpleName());
 
     public FileManager(Console console, String fileName) {
         this.console = console;
@@ -53,13 +57,13 @@ public class FileManager {
             }
             return out.toString();
         } catch (FileNotFoundException e) {
-            console.printerr("Файл не найден. Коллекция пуста");
+            logger.error("Файл не найден. Коллекция пуста");
             return "";
         } catch (PermissionDeniedException e) {
-            console.printerr(e.getMessage() + ". Коллекция пуста");
+            logger.error(e.getMessage() + ". Коллекция пуста");
             return "";
         } catch (IOException e) {
-            console.printerr("Json-файл не найден. Коллекция пуста");
+            logger.error("Json-файл не найден. Коллекция пуста");
             return "";
         }
     }

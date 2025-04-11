@@ -1,24 +1,30 @@
 package ru.varino.server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.varino.common.io.Console;
 import ru.varino.common.io.StandartConsole;
 import ru.varino.common.models.Movie;
+import ru.varino.common.utility.NetworkManager;
 import ru.varino.common.utility.RecursionDequeHandler;
 import ru.varino.server.managers.*;
 import ru.varino.server.commands.*;
+import ru.varino.common.utility.ServerConfiguration;
 
+import java.net.InetSocketAddress;
 import java.util.Hashtable;
-import java.util.Scanner;
+
 
 public class RunServer {
+    private static final Logger logger = LoggerFactory.getLogger(RunServer.class.getSimpleName());
     public static void main(String[] args) {
-        System.out.println("Initialization...");
+        logger.info("Initialization...");
 
         Console console = new StandartConsole();
 
         String fileName = "";
         try {
-            fileName = "D:\\Java projects\\lab6\\src\\main\\java\\ru\\varino\\start.json";
+            fileName = "D:\\Java projects\\lab6\\start.json";
         } catch (ArrayIndexOutOfBoundsException e) {
             console.println("Введите имя файла с помощью аргумента командной строки");
             System.exit(0);
@@ -31,10 +37,10 @@ public class RunServer {
         String json = fileManager.read();
         Hashtable<Integer, Movie> initCollection = parseManager.getHashTableFromJson(json);
         collectionManager.setCollection(initCollection);
+        logger.info("Коллекция загружена");
 
 
         CommandManager commandManager = new CommandManager();
-        RecursionDequeHandler recursionDequeHandler = RecursionDequeHandler.getInstance();
 
         commandManager
                 .add("show", new Show(collectionManager))
@@ -50,16 +56,17 @@ public class RunServer {
                 .add("remove_lower_key", new RemoveLowerKey(collectionManager))
                 .add("average_of_total_box_office", new AverageTotalBoxOffice(collectionManager))
                 .add("min_by_director", new MinByDirector(collectionManager))
-                .add("count_less_than_genre", new CountLessGenre(collectionManager));
+                .add("count_less_than_genre", new CountLessGenre(collectionManager))
+                .add("save", new Save(parseManager, fileManager, collectionManager));
+        logger.info("Команды загружены");
 
         RequestManager requestManager = new RequestManager(commandManager);
         CommandListener commandListener = new CommandListener(fileManager, collectionManager, parseManager, console);
-        try {
-            Server server = new Server(8080, requestManager, fileManager, collectionManager, parseManager, console, commandListener);
-            server.run();
+        InetSocketAddress address = new InetSocketAddress(ServerConfiguration.HOST, ServerConfiguration.PORT);
+        NetworkManager networkManager = new NetworkManagerImpl(requestManager, address);
 
-        } catch (Exception e) {
-            console.printerr("Ошибка");
-        }
+        Server server = new Server(commandListener, networkManager);
+        logger.info("Сервер запущен");
+        server.run();
     }
 }

@@ -4,6 +4,9 @@ import ru.varino.server.managers.CollectionManager;
 import ru.varino.common.communication.RequestEntity;
 import ru.varino.common.communication.ResponseEntity;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Класс команды RemoveLowerKey
  */
@@ -26,11 +29,11 @@ public class RemoveLowerKey extends Command {
         if (args.isEmpty()) return ResponseEntity.badRequest().body("Неверные аргументы");
         try {
             Integer id = Integer.parseInt(args);
-            for (Integer k : collectionManager.getElementsIds()) {
-                if (k < id) {
-                    collectionManager.removeElementFromCollection(k);
-                }
-            }
+            List<Integer> idsToRemove = collectionManager.getElementsIds().stream()
+                    .filter(k -> k < id)
+                    .toList();
+
+            idsToRemove.forEach(collectionManager::removeElementFromCollection);
             return ResponseEntity.ok().body("Элементы удалены из коллекции");
 
         } catch (NumberFormatException e) {

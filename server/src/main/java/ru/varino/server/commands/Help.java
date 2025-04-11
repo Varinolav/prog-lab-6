@@ -4,6 +4,8 @@ import ru.varino.server.managers.CommandManager;
 import ru.varino.common.communication.RequestEntity;
 import ru.varino.common.communication.ResponseEntity;
 
+import java.util.stream.Collectors;
+
 /**
  * Класс команды Help
  */
@@ -31,11 +33,10 @@ public class Help extends Command {
             return ResponseEntity.badRequest().body("Команда не найдена");
         }
 
-        StringBuilder builder = new StringBuilder();
-        commandManager.getCommands().values().forEach(command -> {
-            builder.append(command.getName()).append(" - ").append(command.getDescription()).append("\n");
-        });
-        return ResponseEntity.ok().body(builder.substring(0, builder.length() - 2));
+        String result = commandManager.getCommands().values().stream()
+                .map(command -> command.getName() + " - " + command.getDescription())
+                .collect(Collectors.joining("\n"));
+        return ResponseEntity.ok().body(result.substring(0, result.length() - 2));
     }
 }
 

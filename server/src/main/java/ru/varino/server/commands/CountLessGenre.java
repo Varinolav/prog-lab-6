@@ -19,6 +19,7 @@ public class CountLessGenre extends Command {
 
     /**
      * {@inheritDoc}
+     *
      * @param req запрос для выполнения команды
      * @return {@link ResponseEntity}
      */
@@ -28,14 +29,10 @@ public class CountLessGenre extends Command {
         if (args.isEmpty()) return ResponseEntity.badRequest().body("Неверные аргументы");
         if (collectionManager.getCollection().isEmpty()) return ResponseEntity.badRequest().body("Коллекция пуста");
         try {
-            long count = 0;
-            for (Movie movie : collectionManager.getElements()) {
-                if (movie.getGenre().compareTo(MovieGenre.valueOf(args)) < 0) {
-                    count++;
-                }
-
-
-            }
+            long count = collectionManager.getElements().stream()
+                    .filter(e -> e.getGenre()
+                            .compareTo(MovieGenre.valueOf(args)) < 0)
+                    .count();
             return ResponseEntity.ok().body(String.valueOf(count));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Неверное значение. (Возможные варианты - %s)".formatted(MovieGenre.getNames()));

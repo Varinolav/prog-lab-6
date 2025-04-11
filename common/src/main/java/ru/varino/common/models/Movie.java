@@ -11,7 +11,7 @@ import java.time.LocalDate;
  */
 public final class Movie implements Comparable<Movie>, Validatable, Serializable {
 
-    private final Integer id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
+    private Integer id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private final String name; //Поле не может быть null, Строка не может быть пустой
     private final Coordinates coordinates; //Поле не может быть null
     private final LocalDate creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
@@ -27,7 +27,6 @@ public final class Movie implements Comparable<Movie>, Validatable, Serializable
      * @param builder {@link MovieBuilder} билдер фильма
      */
     public Movie(MovieBuilder builder) {
-        id = builder.getId();
         name = builder.getName();
         coordinates = builder.getCoordinates();
         creationDate = builder.getCreationDate();
@@ -78,6 +77,10 @@ public final class Movie implements Comparable<Movie>, Validatable, Serializable
 
     public Person getDirector() {
         return director;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
 

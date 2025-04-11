@@ -18,6 +18,7 @@ public class AverageTotalBoxOffice extends Command {
 
     /**
      * {@inheritDoc}
+     *
      * @param req запрос для выполнения команды
      * @return {@link ResponseEntity}
      */
@@ -26,11 +27,8 @@ public class AverageTotalBoxOffice extends Command {
         String args = req.getParams();
         if (!args.isEmpty()) return ResponseEntity.badRequest().body("Неверные аргументы");
         if (collectionManager.getCollection().isEmpty()) return ResponseEntity.badRequest().body("Коллекция пуста");
-        long sum = 0;
-        for (Movie m : collectionManager.getElements()) {
-            sum += m.getTotalBoxOffice();
-        }
-        long res = sum / collectionManager.getCollection().size();
+
+        double res = collectionManager.getElements().stream().mapToLong(Movie::getTotalBoxOffice).average().orElse(0);
         return ResponseEntity.ok().body("Среднее значение totalBoxOffice: %s".formatted(res));
     }
 }

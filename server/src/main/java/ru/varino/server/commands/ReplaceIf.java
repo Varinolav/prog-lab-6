@@ -1,5 +1,6 @@
 package ru.varino.server.commands;
 
+import ru.varino.common.models.modelUtility.IdGenerator;
 import ru.varino.server.managers.CollectionManager;
 import ru.varino.common.models.Movie;
 import ru.varino.common.communication.RequestEntity;
@@ -45,6 +46,7 @@ public class ReplaceIf extends Command {
             }
             if (comparisonResult == null) throw new RuntimeException();
             if (comparisonResult) {
+                movie.setId(IdGenerator.getInstance().generateId());
                 collectionManager.addElementToCollection(id, movie);
                 return ResponseEntity.ok().body("Элемент успешно заменен");
             } else {

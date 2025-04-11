@@ -1,7 +1,10 @@
 package ru.varino.server.managers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.varino.common.exceptions.PermissionDeniedException;
 import ru.varino.common.io.Console;
+import ru.varino.server.RunServer;
 
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -11,6 +14,7 @@ public class CommandListener {
     private CollectionManager collectionManager;
     private ParseManager parseManager;
     private Console console;
+    private static final Logger logger = LoggerFactory.getLogger(CommandListener.class.getSimpleName());
 
     public CommandListener(FileManager fileManager, CollectionManager collectionManager, ParseManager parseManager, Console console) {
         this.fileManager = fileManager;
@@ -30,7 +34,7 @@ public class CommandListener {
                             fileManager.write(parseManager.getJsonFromHashTable(collectionManager.getCollection()));
                             console.println("Коллекция сохранена в файл");
                         } catch (PermissionDeniedException e) {
-                            console.printerr(e.getMessage());
+                            logger.error(e.getMessage());
                         }
                     } else if (stringInput.trim().equals("exit")) {
                         console.println("Завершение работы сервера...");
@@ -40,7 +44,7 @@ public class CommandListener {
                     }
                 } catch (NoSuchElementException exception) {
                     console.println("");
-                    console.printerr("Работа программы прекращена!");
+                    logger.error("Остановка программы");
                 }
             }
         });

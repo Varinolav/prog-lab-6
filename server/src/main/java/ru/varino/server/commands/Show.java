@@ -24,7 +24,6 @@ public class Show extends Command {
     public ResponseEntity execute(RequestEntity req) {
         String args = req.getParams();
         if (!args.isEmpty()) return ResponseEntity.badRequest().body("Неверные аргументы");
-        System.out.println(collectionManager.getCollection().size());
         return ResponseEntity.ok().body(collectionManager.toString());
 
 

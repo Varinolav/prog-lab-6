@@ -1,10 +1,8 @@
 package ru.varino.server.managers;
 
-import ru.varino.common.models.Movie;
 import ru.varino.server.commands.Command;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
 /**
@@ -39,6 +37,7 @@ public class CommandManager {
     public Command getCommand(String name) {
         return commands.get(name);
     }
+
 
 
 

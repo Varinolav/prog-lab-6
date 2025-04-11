@@ -1,17 +1,17 @@
 package ru.varino.client;
 
+import ru.varino.client.helpers.UserService;
 import ru.varino.common.communication.RequestEntity;
 import ru.varino.common.communication.ResponseEntity;
 import ru.varino.common.io.Console;
-import ru.varino.common.models.Movie;
-import ru.varino.common.models.modelUtility.InteractiveMovieCreator;
+
 
 import java.io.*;
+import java.net.ConnectException;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
+
 import java.net.Socket;
-import java.util.Arrays;
-import java.util.Scanner;
+
 
 public class Client {
     private InetAddress host;
@@ -43,14 +43,31 @@ public class Client {
     }
 
     private boolean requestToServer() {
-        RequestEntity request = userService.handle();
-        try (Socket socket = new Socket(host, port)) {
-            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-            out.writeObject(request);
-            ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
+        try {
+            RequestEntity request = userService.handle();
+            if (request.getCommand().isEmpty()) return true;
+            try (Socket socket = new Socket(host, port)) {
+                OutputStream out = socket.getOutputStream();
+                out.write(serializeRequest(request));
+                out.flush();
 
-            ResponseEntity response = (ResponseEntity) input.readObject();
-            console.printResponse(response);
+                if (request.getCommand().equals("save")) {
+                    System.exit(0);
+                }
+
+                InputStream input = socket.getInputStream();
+
+                ObjectInputStream ois = new ObjectInputStream(input);
+
+                ResponseEntity response = (ResponseEntity) ois.readObject();
+                console.printResponse(response);
+            } catch (ClassNotFoundException e) {
+                console.printerr("Класса с таким именем не существует");
+            } catch (ConnectException e) {
+                console.printerr("Сервер временно недоступен");
+            } catch (Exception e) {
+                console.printerr(e.toString());
+            }
             return true;
 
         } catch (Exception e) {
@@ -59,5 +76,14 @@ public class Client {
         }
 
     }
+
+    private static byte[] serializeRequest(RequestEntity request) throws IOException {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+             ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+            oos.writeObject(request);
+            return bos.toByteArray();
+        }
+    }
+
 
 }

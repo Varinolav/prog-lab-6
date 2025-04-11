@@ -1,5 +1,6 @@
 package ru.varino.server.commands;
 
+import ru.varino.common.models.modelUtility.IdGenerator;
 import ru.varino.server.managers.CollectionManager;
 import ru.varino.common.models.Movie;
 import ru.varino.common.models.modelUtility.InteractiveMovieCreator;
@@ -34,6 +35,7 @@ public class Insert extends Command {
             if (collectionManager.getElementById(id) != null) return ResponseEntity.badRequest()
                     .body("Элемента с таким id уже существует в коллекции");
             Movie movie = (Movie) req.getBody();
+            movie.setId(IdGenerator.getInstance().generateId());
             collectionManager.addElementToCollection(id, movie);
             return ResponseEntity.ok().body("Элемент добавлен в коллекцию");
 

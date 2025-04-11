@@ -5,6 +5,8 @@ import ru.varino.common.models.Movie;
 import ru.varino.common.communication.RequestEntity;
 import ru.varino.common.communication.ResponseEntity;
 
+import java.util.Comparator;
+
 /**
  * Класс команды MinByDirector
  */
@@ -18,6 +20,7 @@ public class MinByDirector extends Command {
 
     /**
      * {@inheritDoc}
+     *
      * @param req запрос для выполнения команды
      * @return {@link ResponseEntity}
      */
@@ -27,23 +30,14 @@ public class MinByDirector extends Command {
         if (!args.isEmpty()) return ResponseEntity.badRequest().body("Неверные аргументы");
         if (collectionManager.getCollection().isEmpty()) return ResponseEntity.badRequest().body("Коллекция пуста");
 
-        Movie minMovieByDirector = null;
-        for (Movie movie : collectionManager.getElements()) {
-            if (movie.getDirector() != null) {
-                minMovieByDirector = movie;
-                break;
-            }
-        }
-        if (minMovieByDirector == null) return ResponseEntity.badRequest().body("У всех элементов поле director не определено");
 
+        Movie minMovieByDirector = collectionManager.getElements().stream()
+                .filter(m -> m.getDirector() != null)
+                .min(Comparator.comparing(Movie::getDirector))
+                .orElse(null);
 
-        for (Movie movie : collectionManager.getElements()) {
-            if (movie.getDirector() == null) continue;
-            if (movie.getDirector().compareTo(minMovieByDirector.getDirector()) < 0) {
-                minMovieByDirector = movie;
-
-            }
-        }
+        if (minMovieByDirector == null)
+            return ResponseEntity.badRequest().body("У всех элементов поле director не определено");
 
         return ResponseEntity.ok().body(minMovieByDirector.toString());
     }
